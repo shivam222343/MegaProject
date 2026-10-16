@@ -83,11 +83,30 @@ const registerUser = async (req, res) => {
 // @route   POST /api/auth/login
 // @access  Public
 const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please provide both email and password' });
+        }
 
-    if (user && (await user.matchPassword(password))) {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        if (!user.password && user.googleId) {
+            return res.status(400).json({
+                message: 'This account was registered using Google. Please sign in with Google.'
+            });
+        }
+
+        const isMatch = await user.matchPassword(password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
         // If no avatar set, assign one now
         if (!user.preferences?.avatarUrl) {
             const avatar = getRandomAvatar(user.displayName);
@@ -121,8 +140,9 @@ const loginUser = async (req, res) => {
             documents: user.documents || {},
             showAvatarPopup: !user.preferences?.hasConfirmedAvatar
         });
-    } else {
-        res.status(401).json({ message: 'Invalid email or password' });
+    } catch (error) {
+        console.error('[loginUser] Error:', error);
+        res.status(500).json({ message: 'Server error during login' });
     }
 };
 
