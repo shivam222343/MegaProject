@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { 
     Users, Building2, ShieldCheck, BarChart3, 
     Settings, Bell, TrendingUp, PlusCircle, 
-    FileText, Star, MessageSquare 
+    FileText, Star, MessageSquare, Grid3X3
 } from 'lucide-react';
 import axios from 'axios';
 import './AdminDashboard.css';
@@ -64,6 +64,13 @@ const AdminDashboard = () => {
             icon: FileText,
             link: '#',
             color: '#F59E0B'
+        },
+        {
+            title: 'Seat Matrix',
+            desc: 'Upload and manage DTE seat matrix PDFs — view vacant seats by year & round.',
+            icon: Grid3X3,
+            link: '/admin/seat-matrix',
+            color: '#10B981'
         },
         {
             title: 'System Analytics',

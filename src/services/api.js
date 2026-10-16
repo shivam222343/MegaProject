@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 
 const LOCAL_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5100/api/' : 'http://localhost:5100/api/';
 const RENDER_URL = 'https://alloteme-android-cqdu.onrender.com/api/';
-const API_BASE_URL = RENDER_URL;
+const API_BASE_URL = LOCAL_URL;
 
 export const api = axios.create({
     baseURL: API_BASE_URL,
@@ -174,6 +174,17 @@ export const optionFormAPI = {
     add: (data) => api.post('option-forms', data),
     delete: (id) => api.delete(`option-forms/${id}`)
 };
+
+export const seatMatrixAPI = {
+    parsePdf: (formData) => api.post('seat-matrix/parse-pdf', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+    getSummary: () => api.get('seat-matrix/summary/all'),
+    getByInstitution: (id, params) => api.get(`seat-matrix/${id}`, { params }),
+    getVacantSeats: (params) => api.get('seat-matrix/vacant', { params }),
+    delete: (institutionId, params) => api.delete(`seat-matrix/${institutionId}`, { params })
+};
+
 
 export default {
     authAPI,

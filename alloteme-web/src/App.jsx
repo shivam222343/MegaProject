@@ -12,6 +12,7 @@ import CollegeLogin from './pages/college/CollegeLogin';
 import CollegeDashboard from './pages/college/CollegeDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import RegisterCollegeAdmin from './pages/admin/RegisterCollegeAdmin';
+import SeatMatrixAdmin from './pages/admin/SeatMatrixAdmin';
 import PremiumPlans from './pages/PremiumPlans';
 import PortalModal from './components/PortalModal';
 import AppBanner from './components/AppBanner';
@@ -63,6 +64,7 @@ function App() {
               {/* System Admin Routes */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/register-college-admin" element={<RegisterCollegeAdmin />} />
+              <Route path="/admin/seat-matrix" element={<SeatMatrixAdmin />} />
             </Routes>
           </main>
           {window.location.pathname !== '/college/dashboard' && <Footer />}

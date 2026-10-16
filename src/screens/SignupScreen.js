@@ -9,6 +9,7 @@ import { Colors, Typography, Spacing, BorderRadius, Shadows } from '../constants
 import { User, Check, Mail, Phone, Lock, ArrowRight } from 'lucide-react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useWebGoogleLogin } from '../utils/webAuthHelper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const INTRO_SLIDES = [
     {
@@ -67,8 +68,11 @@ const SignupScreen = ({ route, navigation }) => {
     const [prevSlide, setPrevSlide] = useState(() => (skipIntroParam ? 5 : 0));
     const fadeAnim = useRef(new Animated.Value(1)).current;
 
+    const insets = useSafeAreaInsets();
+
     // Window dimensions state for responsive web layout
     const [windowWidth, setWindowWidth] = useState(() => Dimensions.get('window').width);
+    const [windowHeight, setWindowHeight] = useState(() => Dimensions.get('window').height);
     const isDesktop = Platform.OS === 'web' && windowWidth >= 768;
 
     const { register, sendSignupOtp, verifyOnlyOtp, verifySignupOtp, googleLogin, updateUserProfile } = useAuth();
@@ -88,6 +92,7 @@ const SignupScreen = ({ route, navigation }) => {
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window }) => {
             setWindowWidth(window.width);
+            setWindowHeight(window.height);
         });
         return () => subscription?.remove();
     }, []);
@@ -539,8 +544,20 @@ const SignupScreen = ({ route, navigation }) => {
             outputRange: [1.0, 1.08]
         });
 
+        const mobileBottomPadding = !isDesktop ? Math.max(insets.bottom + 24, 32) : Spacing.md;
+        const mobileTopPadding = !isDesktop ? Math.max(insets.top + 8, 16) : Spacing.md;
+
         return (
-            <View style={styles.sliderContent}>
+            <View style={[
+                styles.sliderContent,
+                !isDesktop && [
+                    styles.mobileSliderContainer,
+                    {
+                        paddingTop: mobileTopPadding,
+                        paddingBottom: mobileBottomPadding,
+                    }
+                ]
+            ]}>
                 {/* Image Showcase Container */}
                 <View style={styles.imageWrapper}>
                     {prevSliderIndex !== sliderIndex && (
@@ -805,14 +822,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: Spacing.md,
     },
+    mobileSliderContainer: {
+        flex: 1,
+        justifyContent: 'space-between',
+        alignSelf: 'center',
+    },
     imageWrapper: {
-        width: 250,
-        height: 480,
+        width: Platform.OS === 'web' ? 250 : '75%',
+        maxWidth: 250,
+        height: Platform.OS === 'web' ? 480 : undefined,
+        maxHeight: Platform.OS === 'web' ? 480 : 380,
+        aspectRatio: 250 / 480,
         borderRadius: BorderRadius.lg,
         backgroundColor: '#FFFFFF',
         overflow: 'hidden',
         alignSelf: 'center',
-        marginVertical: Spacing.sm,
+        marginVertical: Spacing.xs,
         position: 'relative',
         ...Shadows.lg,
     },
@@ -831,8 +856,8 @@ const styles = StyleSheet.create({
     infoContainer: {
         alignItems: 'center',
         paddingHorizontal: Spacing.lg,
-        marginTop: Spacing.md,
-        height: 125,
+        marginTop: Spacing.sm,
+        minHeight: 95,
         justifyContent: 'center',
     },
     slideTitle: {
@@ -853,7 +878,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginVertical: Spacing.lg,
+        marginVertical: Spacing.md,
         gap: 8,
     },
     dot: {
@@ -875,7 +900,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: Spacing.lg,
         marginTop: Spacing.xs,
         width: '100%',
-        maxWidth: 320,
+        maxWidth: 340,
         alignSelf: 'center',
     },
     nextBtn: {

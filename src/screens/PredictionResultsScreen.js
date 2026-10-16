@@ -5,7 +5,7 @@ import { Colors, Shadows } from '../constants/theme';
 import { MapPin, Layers, Calendar, Download, GripVertical, Info, ChevronLeft, ChevronRight, FileText, Trash2, Search, SortAsc, X, ShieldCheck, Star, Bookmark, PlusCircle } from 'lucide-react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { SUBSCRIPTION_PLANS } from '../constants/subscriptions';
-import { authAPI, optionFormAPI } from '../services/api';
+import { authAPI, optionFormAPI, seatMatrixAPI } from '../services/api';
 import OptimizedImage from '../components/ui/OptimizedImage';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 import { TouchableOpacity as GestureHandlerTouchableOpacity } from 'react-native-gesture-handler';
@@ -26,7 +26,8 @@ const PredictionResultRow = React.memo(({
     sortBy,
     navigation,
     handleSavePrediction,
-    handleDelete
+    handleDelete,
+    vacantSeatsMap
 }) => {
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -115,7 +116,8 @@ const PredictionResultRow = React.memo(({
                             <Text style={styles.branchName}>{item.branch}</Text>
                             <View style={styles.badgeRow}>
                                 <View style={[styles.badge, styles.roundBadge]}><Layers size={10} color={Colors.primary} /><Text style={styles.badgeText}>R-{item.round}</Text></View>
-                                <View style={[styles.badge, styles.yearBadge]}><Calendar size={10} color={Colors.secondary} /><Text style={styles.badgeText}>{item.year}</Text></View                                 {item.category && (
+                                <View style={[styles.badge, styles.yearBadge]}><Calendar size={10} color={Colors.secondary} /><Text style={styles.badgeText}>{item.year}</Text></View>
+                            {item.category && (
                                     <View style={[
                                         styles.badge,
                                         {
@@ -172,7 +174,31 @@ const PredictionResultRow = React.memo(({
                                             }
                                         ]}>{item.seatType}</Text>
                                     </View>
-                                )})}
+                                )}
+                                {/* ── Vacant Seats Tag ── */}
+                                {(() => {
+                                    const collegeId = item.collegeId?._id || item.collegeId;
+                                    const branchData = vacantSeatsMap?.[collegeId]?.[item.branch];
+                                    if (!branchData) return null;
+                                    const vacant = branchData.vacantCAPSeats;
+                                    return (
+                                        <View style={[
+                                            styles.badge,
+                                            {
+                                                backgroundColor: vacant > 0 ? '#f0fdf4' : '#fef2f2',
+                                                borderColor: vacant > 0 ? '#86efac' : '#fca5a5',
+                                                borderWidth: 1
+                                            }
+                                        ]}>
+                                            <Text style={[
+                                                styles.badgeText,
+                                                { color: vacant > 0 ? '#16a34a' : '#dc2626', fontWeight: '700' }
+                                            ]}>
+                                                {vacant > 0 ? `VACANT: ${vacant}` : 'FILLED'}
+                                            </Text>
+                                        </View>
+                                    );
+                                })()}
                             </View>
                         </View>
 
@@ -269,6 +295,7 @@ const PredictionResultsScreen = ({ route, navigation }) => {
     const [presetCategory, setPresetCategory] = useState(category || 'OPEN');
     const [presetRound, setPresetRound] = useState(1);
     const [isSavingPreset, setIsSavingPreset] = useState(false);
+    const [vacantSeatsMap, setVacantSeatsMap] = useState({});
 
     const handleTryAgain = useCallback(() => {
         if (navigation.canGoBack()) {
@@ -291,6 +318,41 @@ const PredictionResultsScreen = ({ route, navigation }) => {
         setLocalSavedPredictions(keys);
         setLocalSavedPredictions(keys);
     }, [user?.savedPredictions]);
+
+    // ── Fetch vacant seats for all prediction results ──────────────────────
+    useEffect(() => {
+        if (!results || results.length === 0) return;
+
+        const fetchVacantSeats = async () => {
+            try {
+                // Collect unique college IDs and use the most common year/round in results
+                const uniqueCollegeIds = [...new Set(
+                    results.map(r => r.collegeId?._id || r.collegeId).filter(Boolean)
+                )];
+                if (uniqueCollegeIds.length === 0) return;
+
+                // Use the round/year from params, falling back to most common in results
+                const targetYear = params.year || results[0]?.year || new Date().getFullYear();
+                const targetRound = params.round || results[0]?.round || 1;
+
+                const res = await seatMatrixAPI.getVacantSeats({
+                    collegeIds: uniqueCollegeIds.join(','),
+                    year: targetYear,
+                    round: targetRound,
+                    examType: examType || params.examType
+                });
+
+                if (res.data?.success) {
+                    setVacantSeatsMap(res.data.data);
+                }
+            } catch (err) {
+                // Silently fail — vacant seats are supplementary info
+                console.log('[VacantSeats] fetch skipped:', err.message);
+            }
+        };
+
+        fetchVacantSeats();
+    }, [results]);
 
     const handleToggleSave = useCallback(async (id) => {
         if (!id || savingId) return;
@@ -710,9 +772,10 @@ const PredictionResultsScreen = ({ route, navigation }) => {
                 navigation={navigation}
                 handleSavePrediction={handleSavePrediction}
                 handleDelete={handleDelete}
+                vacantSeatsMap={vacantSeatsMap}
             />
         );
-    }, [navigation, localSavedPredictions, searchText, sortBy, handleSavePrediction, handleDelete]);
+    }, [navigation, localSavedPredictions, searchText, sortBy, handleSavePrediction, handleDelete, vacantSeatsMap]);
 
     return (
         <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>

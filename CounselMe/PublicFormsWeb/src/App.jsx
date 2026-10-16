@@ -19,8 +19,8 @@ import {
 import confetti from 'canvas-confetti';
 import './App.css';
 
-// Production Render API Base
-const API_BASE = 'https://alloteme-android-cqdu.onrender.com/api/forms';
+// Local API Base
+const API_BASE = 'http://localhost:5100/api/forms';
 
 const CollegeSelector = ({ colleges, value, onChange, placeholder = "Select a college..." }) => {
   const [searchTerm, setSearchTerm] = useState('');

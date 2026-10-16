@@ -59,6 +59,7 @@ import AdminDocumentManagerScreen from '../screens/AdminDocumentManagerScreen';
 import AdminStudentDocumentsScreen from '../screens/AdminStudentDocumentsScreen';
 import OptionFormListScreen from '../screens/OptionFormListScreen';
 import OptionFormViewScreen from '../screens/OptionFormViewScreen';
+import UploadSeatMatrixScreen from '../screens/UploadSeatMatrixScreen';
 
 // Custom Nav Components
 import Sidebar from '../components/navigation/Sidebar';
@@ -99,6 +100,7 @@ const TabNavigator = () => {
             <Tab.Screen name="SavedPredictions" component={SavedPredictionsScreen} options={{ tabBarButton: () => null }} />
             <Tab.Screen name="CreateInstitution" component={CreateInstitutionScreen} />
             <Tab.Screen name="UploadCutoff" component={UploadCutoffScreen} />
+            <Tab.Screen name="UploadSeatMatrix" component={UploadSeatMatrixScreen} />
             <Tab.Screen name="AITraining" component={AITrainingScreen} />
             <Tab.Screen name="FrequentQuestionsManager" component={FrequentQuestionsManager} />
             <Tab.Screen name="FeaturedColleges" component={FeaturedCollegesScreen} />

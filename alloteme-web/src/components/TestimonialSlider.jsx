@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
 
-const API_URL = "https://alloteme-android-cqdu.onrender.com/api/reviews";
+const API_URL = "http://localhost:5100/api/reviews";
 
 const TestimonialSlider = () => {
     const [reviews, setReviews] = useState([]);

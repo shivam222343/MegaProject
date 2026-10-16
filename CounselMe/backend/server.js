@@ -66,6 +66,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/institutions', require('./routes/institutionRoutes'));
 app.use('/api/cutoffs', require('./routes/cutoffRoutes'));
+app.use('/api/seat-matrix', require('./routes/seatMatrixRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));

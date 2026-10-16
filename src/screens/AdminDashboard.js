@@ -18,7 +18,8 @@ import {
     TrendingUp,
     FileText,
     CheckCircle,
-    Info
+    Info,
+    Grid3X3
 } from 'lucide-react-native';
 
 const AdminDashboard = ({ navigation }) => {
@@ -68,6 +69,13 @@ const AdminDashboard = ({ navigation }) => {
             icon: FileUp,
             route: 'UploadCutoff',
             color: '#F59E0B'
+        },
+        {
+            title: 'Seat Matrix',
+            desc: 'Upload & view DTE seat matrix — vacant seats by year & round',
+            icon: Grid3X3,
+            route: 'UploadSeatMatrix',
+            color: '#10B981'
         },
         {
             title: 'Train AI Counselor',

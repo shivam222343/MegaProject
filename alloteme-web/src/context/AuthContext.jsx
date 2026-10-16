@@ -4,7 +4,7 @@ import axios from 'axios';
 const AuthContext = createContext();
 
 // Set base URL for axios
-axios.defaults.baseURL = 'https://alloteme-android-cqdu.onrender.com';
+axios.defaults.baseURL = 'http://localhost:5100';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);

@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const LOCAL_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5100/api/' : 'http://localhost:5100/api/';
 const RENDER_URL = 'https://alloteme-android-cqdu.onrender.com/api/';
-const API_BASE_URL = RENDER_URL;
+const API_BASE_URL = LOCAL_URL;
 
 // Simple unauthenticated fetch — no interceptors, no token
 const fetchVersionConfig = async () => {
